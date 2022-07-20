@@ -1,0 +1,99 @@
+--- PRIMERA PARTE -------------------------------------------------
+Declare
+@FechaP date,  
+@Empresa varchar(5)   = NULL,  
+@FechaEmision datetime,  
+@FechaD datetime,  
+@FechaA datetime,  
+@UsuarioAsignado varchar(20),  
+@Sucursal int,   
+@Mov varchar(40),  
+@Observaciones  varchar(100),  
+@IDMov  int,  
+@Renglon  int,  
+@Personal varchar(20),  
+@HoraRegistro  varchar(5),  
+@FechaMin datetime,  
+@Evento varchar(20),  
+@logico bit,
+@observacion varchar(100) ,
+@fechac datetime,
+@fecha date,
+@time time,
+@Entrada datetime, 
+@SC1 datetime, 
+@EC1 datetime, 
+@SC2 datetime,
+@EC2 datetime, 
+@Salida  datetime,
+@jornada varchar(50),
+------------------------------------------------------------
+@desde as date,
+@hasta as date;
+SET @desde = '27/07/2020';
+SET @hasta = '02/08/2020';
+--SET @desde = (select convert(date,getdate()-4));
+--SET @hasta = (select convert(date,getdate()));
+-------------------------------------------------------------
+delete litochekadas 
+where 
+--fechab>='25/04/2020'
+convert(date,fechab) >=  @desde
+
+DECLARE crKyo CURSOR LOCAL FOR      
+	select 'LITO', b.personal, fechac,fecha,tiempo 
+	from BDAccesos.dbo.AccesosLito b
+	join personal a on b.personal=a.personal
+	where 
+	--convert(date,b.fecha) between '27/07/2020' and '02/08/2020' 
+	convert(date,b.fecha) between @desde and @hasta
+	order by FechaC
+
+OPEN crKyo          
+  FETCH NEXT FROM crKyo into @Empresa, @personal, @fechac, @Fecha, @Time  
+  WHILE @@FETCH_STATUS <> -1 AND @@Error = 0           
+  BEGIN          
+   IF @@FETCH_STATUS <> -2           
+   BEGIN          
+	   IF not exists (select * from LitoChekadas where personal=@Personal and  fechaB=@Fecha and Logico1=1)
+			Insert into LitoChekadas(empresa, personal,FechaA,FechaB,HoraRegistro,Logico1)
+			select @Empresa, @personal, @fechac, @Fecha, @Time  ,1
+	   If  (Select top 1 DATEADD([minute], 1,HoraRegistro) from LitoChekadas where personal=@Personal and  fechaB=@Fecha   order by FechaA  desc)<@time
+			Insert into LitoChekadas(empresa, personal,FechaA,FechaB,HoraRegistro,Logico1,Logico2)
+			select @Empresa, @personal, @fechac, @Fecha, @Time  ,0,1
+	END          
+  FETCH NEXT FROM crKyo into @Empresa, @personal, @fechac, @Fecha, @Time  
+  END          
+  CLOSE crKyo          
+ DEALLOCATE crKyo
+
+/*
+DECLARE crKyo CURSOR LOCAL FOR      
+	select 'LITO', b.personal, fechac,fecha,tiempo 
+	from BDAccesos.dbo.AccesosLito b
+	join personal a on b.personal=a.personal
+	where 
+	--convert(date,b.fecha) between '25/04/2020' and '30/05/2020'  
+	convert(date,b.fecha) between @desde and @hasta
+	order by FechaC
+
+OPEN crKyo          
+FETCH NEXT FROM crKyo into @Empresa, @personal, @fechac, @Fecha, @Time  
+	 WHILE @@FETCH_STATUS <> -1 AND @@Error = 0           
+	 	BEGIN
+			IF @@FETCH_STATUS <> -2           
+			 BEGIN          
+			   IF not exists (select * from LitoChekadas where personal=@Personal and  fechaB=@Fecha and Logico1=1)
+				  Insert into LitoChekadas(empresa, personal,FechaA,FechaB,HoraRegistro,Logico1)
+				   select @Empresa, @personal, @fechac, @Fecha, @Time  ,1
+				   If  (Select top 1 DATEADD([minute], 1,HoraRegistro) from LitoChekadas 
+						where personal=@Personal and  fechaB=@Fecha   
+						order by FechaA  desc)<@time
+				   Insert into LitoChekadas(empresa, personal,FechaA,FechaB,HoraRegistro,Logico1,Logico2)
+					Select @Empresa, @personal, @fechac, @Fecha, @Time  ,0,1
+			 END 
+			FETCH NEXT FROM crKyo into @Empresa, @personal, @fechac, @Fecha, @Time  
+		END          
+CLOSE crKyo          
+DEALLOCATE crKyo
+*/
