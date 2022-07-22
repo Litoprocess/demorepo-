@@ -2,14 +2,20 @@
 
 ## descripcion
 
-Este de un proyceto demorepo para mostrar ejemplos de uso de un repositorio.
+Este de un ayauda # este es el contenido del archivo 3
 
-###
+## descripcion
 
-Lista no ordenada
+Este de un ayauda proyceto demorepo para mostrar ejemplos de uso de un repositorio.
 
-- Repo inicializado
-- Agregar archivo al repo
-- Repo limpio
+##contenido
 
+
+###para hacer funcionar el archivo
+proyceto demorepo para mostrar ejemplos de uso de un repositorio.
+
+##contenido
+
+
+###para hacer funcionar el archivo
 
